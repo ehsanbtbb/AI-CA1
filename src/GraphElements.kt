@@ -12,7 +12,7 @@ data class Vertex constructor(val id: Int, val latitude: Float,
     }
 
     override fun compareTo(other: Vertex): Int {
-        return other.costValue.compareTo(costValue)
+        return costValue.compareTo(other.costValue)
     }
 
     enum class Color {
