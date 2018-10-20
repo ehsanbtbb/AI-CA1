@@ -102,35 +102,37 @@ fun Graph.ucs(startNodeId: Int, endNodeId: Int) {
 
 fun Graph.id(startNodeId: Int, endNodeId: Int) {
     var limitedDepth = 0
-    while (!dfs(startNodeId, endNodeId, limitedDepth)) {
-        limitedDepth++
+    do {
         clear()
-    }
+        val resultFound = dfs(startNodeId, endNodeId, limitedDepth)
+        limitedDepth++
+    } while (!resultFound)
 }
 
 fun Graph.dfs(startNodeId: Int, endNodeId: Int, limitedDepth: Int): Boolean {
-    val visitedNodes: MutableSet<Int> = mutableSetOf()
+    val visitedVerticesIds: MutableSet<Int> = mutableSetOf()
     val stack: Stack<Int> = Stack()
-    stack.push(startNodeId)
-    data[startNodeId]?.first?.depth = 0
-    var currentNode = data[startNodeId]
+    var currentlyVisitingVertex = data[startNodeId]!!
+    currentlyVisitingVertex.first.depth = 0
+    stack.push(currentlyVisitingVertex.first.id)
 
-    while (currentNode?.first?.id != endNodeId && stack.isNotEmpty()) {
-        currentNode = data[stack.pop()]
-        visitedNodes.add(currentNode?.first?.id!!)
-        currentNode.first.color = Vertex.Color.BLACK
+    do {
+        currentlyVisitingVertex = data[stack.pop()]!!
+        visitedVerticesIds.add(currentlyVisitingVertex.first.id)
+        currentlyVisitingVertex.first.color = Vertex.Color.BLACK
 
-        currentNode.takeIf { it.first.depth!! < limitedDepth }?.second?.forEach {
-            if (it.first.color == Vertex.Color.WHITE) {
-                it.first.depth = currentNode.first.depth!! + 1
-                it.first.fatherId = currentNode.first.id
-                it.first.color = Vertex.Color.GRAY
-                stack.push(it.first.id)
+        currentlyVisitingVertex.takeIf { it.first.depth!! < limitedDepth }?.second?.forEach { currentNeighbour ->
+            if (currentNeighbour.first.color == Vertex.Color.WHITE) {
+                currentNeighbour.first.depth = currentlyVisitingVertex.first.depth!! + 1
+                currentNeighbour.first.fatherId = currentlyVisitingVertex.first.id
+                currentNeighbour.first.color = Vertex.Color.GRAY
+                stack.push(currentNeighbour.first.id)
             }
         }
-    }
-    return if (currentNode?.first?.id!! == endNodeId) {
-        printPath(startNodeId, endNodeId, visitedNodes)
+    } while (currentlyVisitingVertex.first.id != endNodeId && stack.isNotEmpty())
+
+    return if (currentlyVisitingVertex.first.id == endNodeId) {
+        printPath(startNodeId, endNodeId, visitedVerticesIds)
         true
     } else {
         println("No path is found... max depth limit: $limitedDepth")

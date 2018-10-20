@@ -9,8 +9,8 @@ fun main(args: Array<String>) {
     graph.ucs(2, 0)
     graph.ucs(4, 1)
     graph.ucs(1, 3)
-//    graph.clear()
-//    graph.id(0, 4)
-//    graph.clear()
-//    graph.ucs(0, 4)
+    graph.id(0, 2)
+    graph.id(2, 0)
+    graph.id(4, 1)
+    graph.id(1, 3)
 }
