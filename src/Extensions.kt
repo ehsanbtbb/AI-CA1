@@ -1,3 +1,6 @@
+import Vertex.Color.BLACK
+import Vertex.Color.GRAY
+import Vertex.Color.WHITE
 import java.util.ArrayDeque
 import java.util.PriorityQueue
 import java.util.Queue
@@ -12,7 +15,6 @@ fun Vertex.distanceTo(vertex: Vertex): Float {
 fun Vertex.clear() {
     fatherId = null
     depth = null
-    isVisited = false
     color = Vertex.Color.WHITE
 }
 
@@ -23,27 +25,30 @@ fun Graph.clear() {
 }
 
 fun Graph.bfs(startNodeId: Int, endNodeId: Int) {
-    val visitedNodes: MutableSet<Int> = mutableSetOf()
+    clear()
+    val visitedVerticesIds: MutableSet<Int> = mutableSetOf()
     val queue: Queue<Int> = ArrayDeque<Int>()
-    queue.add(startNodeId)
-    var currentNodeId = startNodeId
+    var currentlyVisitingId = startNodeId
+    queue.add(currentlyVisitingId)
 
-    while (currentNodeId != endNodeId && queue.isNotEmpty()) {
-        val headOfQueue = queue.poll()
-        visitedNodes.add(headOfQueue)
-        data[headOfQueue]?.first?.apply {
-            isVisited = true
-        }
-        currentNodeId = headOfQueue
-        data[currentNodeId]?.second?.forEach {
-            if (!it.first.isVisited) {
+    while (currentlyVisitingId != endNodeId && queue.isNotEmpty()) {
+        visitedVerticesIds.add(currentlyVisitingId)
+        val currentlyVisitingVertex = data[currentlyVisitingId]?.first!!
+        currentlyVisitingVertex.color = BLACK
+
+        val currentlyVisitingVertexNeighbours = data[currentlyVisitingId]!!.second
+        currentlyVisitingVertexNeighbours.forEach {
+            if (it.first.color == WHITE) {
                 queue.add(it.first.id)
-                it.first.fatherId = currentNodeId
+                it.first.color = GRAY
+                it.first.fatherId = currentlyVisitingId
             }
         }
+        currentlyVisitingId = queue.poll()
     }
-    if (currentNodeId == endNodeId) {
-        printPath(startNodeId, endNodeId, visitedNodes)
+    if (currentlyVisitingId == endNodeId) {
+        visitedVerticesIds.add(currentlyVisitingId)
+        printPath(startNodeId, endNodeId, visitedVerticesIds)
     } else {
         println("No path is found...")
     }
@@ -87,32 +92,32 @@ fun Graph.dfs(startNodeId: Int, endNodeId: Int, limitedDepth: Int): Boolean {
     }
 }
 
-fun Graph.ucs(startNodeId: Int, endNodeId: Int) {
-    val visitedNodes: MutableSet<Int> = mutableSetOf()
-    val queue: PriorityQueue<Vertex> = PriorityQueue()
-    queue.add(data[startNodeId]?.first!!)
-    var currentNodeId = startNodeId
-
-    while (currentNodeId != endNodeId && queue.isNotEmpty()) {
-        val headOfQueue = queue.poll()
-        visitedNodes.add(headOfQueue.id)
-        headOfQueue.isVisited = true
-        currentNodeId = headOfQueue.id
-        data[currentNodeId]?.second?.forEach {
-            if (!it.first.isVisited) {
-                it.first.fatherId = currentNodeId
-                it.first.costValue = data[currentNodeId]?.first?.costValue!! + data[currentNodeId]?.first?.distanceTo(
-                        it.first)!!
-                queue.add(it.first)
-            }
-        }
-    }
-    if (currentNodeId == endNodeId) {
-        printPath(startNodeId, endNodeId, visitedNodes)
-    } else {
-        println("No path is found...")
-    }
-}
+//fun Graph.ucs(startNodeId: Int, endNodeId: Int) {
+//    val visitedNodes: MutableSet<Int> = mutableSetOf()
+//    val queue: PriorityQueue<Vertex> = PriorityQueue()
+//    queue.add(data[startNodeId]?.first!!)
+//    var currentNodeId = startNodeId
+//
+//    while (currentNodeId != endNodeId && queue.isNotEmpty()) {
+//        val headOfQueue = queue.poll()
+//        visitedNodes.add(headOfQueue.id)
+//        headOfQueue.isVisited = true
+//        currentNodeId = headOfQueue.id
+//        data[currentNodeId]?.second?.forEach {
+//            if (!it.first.isVisited) {
+//                it.first.fatherId = currentNodeId
+//                it.first.costValue = data[currentNodeId]?.first?.costValue!! + data[currentNodeId]?.first?.distanceTo(
+//                        it.first)!!
+//                queue.add(it.first)
+//            }
+//        }
+//    }
+//    if (currentNodeId == endNodeId) {
+//        printPath(startNodeId, endNodeId, visitedNodes)
+//    } else {
+//        println("No path is found...")
+//    }
+//}
 
 fun Graph.astart(startNodeId: Int, endNodeId: Int) {
     val visitedNodes: MutableSet<Int> = mutableSetOf()
