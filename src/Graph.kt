@@ -19,9 +19,6 @@ class Graph private constructor(
             val edges: ArrayList<Edge> = arrayListOf()
 
             //Read the vertex related data from the specified file.
-            File(verticesFileName).readLines().forEach {
-                println(it)
-            }
             File(verticesFileName).forEachLine {
                 it.split(" ".toRegex()).takeIf { it.size == 3 }?.let {
                     val vertex = Vertex(it[0].toInt(), it[1].toFloat(), it[2].toFloat())

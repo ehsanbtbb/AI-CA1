@@ -1,3 +1,6 @@
+import DfsResult.COMPLETE_SEARCH_NO_RESULT
+import DfsResult.NO_RESULT_FOUND
+import DfsResult.RESULT_FOUND
 import Vertex.Color.BLACK
 import Vertex.Color.GRAY
 import Vertex.Color.WHITE
@@ -104,11 +107,14 @@ fun Graph.id(startNodeId: Int, endNodeId: Int) {
     do {
         clear()
         val resultFound = dfs(startNodeId, endNodeId, limitedDepth)
+        if (resultFound == COMPLETE_SEARCH_NO_RESULT) {
+            println("id has completed... No results found...")
+        }
         limitedDepth++
-    } while (!resultFound)
+    } while (resultFound == NO_RESULT_FOUND)
 }
 
-fun Graph.dfs(startNodeId: Int, endNodeId: Int, limitedDepth: Int): Boolean {
+fun Graph.dfs(startNodeId: Int, endNodeId: Int, limitedDepth: Int): DfsResult {
     val visitedVerticesIds: MutableSet<Int> = mutableSetOf()
     val stack: Stack<Int> = Stack()
     var currentlyVisitingVertex = data[startNodeId]!!
@@ -132,11 +138,21 @@ fun Graph.dfs(startNodeId: Int, endNodeId: Int, limitedDepth: Int): Boolean {
 
     return if (currentlyVisitingVertex.first.id == endNodeId) {
         printPath(startNodeId, endNodeId, visitedVerticesIds)
-        true
+        RESULT_FOUND
     } else {
         println("No path is found... max depth limit: $limitedDepth")
-        false
+        if (currentlyVisitingVertex.first.depth == limitedDepth) {
+            NO_RESULT_FOUND
+        } else {
+            COMPLETE_SEARCH_NO_RESULT
+        }
     }
+}
+
+enum class DfsResult {
+    COMPLETE_SEARCH_NO_RESULT,
+    RESULT_FOUND,
+    NO_RESULT_FOUND
 }
 
 fun Graph.astar(startNodeId: Int, endNodeId: Int) {

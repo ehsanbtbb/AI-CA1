@@ -4,7 +4,6 @@ data class Vertex constructor(val id: Int, val latitude: Float,
     var color: Color = Color.WHITE
     var depth: Int? = null
     var realCost: Float = 0f
-    var estimatedCost: Float = 0f
     var costValue: Float = 0f
 
     override fun toString(): String {
